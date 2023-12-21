@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Liste des patients</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+    <style>   
+        #patientTable th,
+        #patientTable td {
+            white-space: nowrap;
+        }
+        @media (max-width: 1200px) {
+            #patientTable th,
+            #patientTable td {
+                font-size: 12px;
+            }
+        }
+        #patientTable_filter {
+            display: none;
+        }
+    </style>
+</head>
+<body class="container-lg m-5">
+    
+
+    <div class="row">
+        <div class="col-md-8">
+            <h1 class="mb-4">Liste des patients</h1>
+        </div>
+        <div class="col-md-2">
+            <a href="{% url 'add_patient' %}" class="btn btn-primary mb-3">Ajouter un patient</a>
+        </div>
+        <div class="col-md-2">
+            <form method="post" action="{% url 'logout' %}" class="form-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Déconnexion ({{ user.username }})</button>
+            </form>
+        </div>
+    </div>
+    
+
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <label for="nameFilter">Filtrer par nom :</label>
+            <input type="text" id="nameFilter" class="form-control">
+        </div>
+    
+        <div class="col-md-3">
+            <label for="genreFilter">Filtrer par sexe :</label>
+            <select id="genreFilter" class="form-control">
+                <option value="">Tous</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+        </div>
+    
+        <div class="col-md-3">
+            <label for="dateFilterInput">Filtrer par date de naissance :</label>
+            <input type="date" id="dateFilterInput" class="form-control">
+        </div>
+    
+        <div class="col-md-3">
+            <label for="addressFilter">Filtrer par adresse :</label>
+            <input type="text" id="addressFilter" class="form-control">
+        </div>
+    
+        <div class="col-md-3">
+            <label for="phoneFilter">Filtrer par numéro de téléphone :</label>
+            <input type="text" id="phoneFilter" class="form-control">
+        </div>
+    </div>
+
+    <table id="patientTable" class="table table-responsive" >
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Nom</th>
+                <th scope="col">Sexe</th>
+                <th scope="col">Date de naissance</th>
+                <th scope="col">Adresse</th>
+                <th scope="col">Numéro de téléphone</th>
+                {% if user.is_authenticated %}
+                <th scope="col">Actions</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for patient in patients %}
+                <tr>
+                    <td>{{ patient.patient_id }}</td>
+                    <td>{{ patient.family_name }} {{ patient.given_name }}</td>
+                    <td>{{ patient.gender }}</td>
+                    <td>{{ patient.birth_date }}</td>
+                    <td>{{ patient.address_line }}, {{ patient.address_city }}, {{ patient.address_state }}, {{ patient.address_postal_code }}, {{ patient.address_country }}</td>
+                    <td>{{ patient.telecom_value }}</td>
+                    {% if user.is_authenticated %}
+                    <td>
+                        <a href="{% url 'edit_patient' patient_id=patient.patient_id %}" class="btn btn-warning btn-sm mr-2 flex-fill">Modifier</a>
+                        <form method="post" action="{% url 'patient_list' %}" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="patient_id" value="{{ patient.patient_id }}">
+                            <button type="submit" class="btn btn-danger btn-sm flex-fill" data-toggle="modal" data-target="#deleteConfirmationModal">Supprimer</button>
+                        </form>                        
+                    </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+   
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Êtes-vous sûr de vouloir supprimer ce patient ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Supprimer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+    <script>
+        $(document).ready(function () {
+            var table = $('#patientTable').DataTable({
+                "paging": true,
+                "ordering": false,
+                language: {
+                    "sEmptyTable":     "Aucune donnée disponible dans le tableau",
+                    "sInfo":           "Affichage de l'élément _START_ à _END_ sur _TOTAL_ éléments",
+                    "sInfoEmpty":      "Affichage de l'élément 0 à 0 sur 0 élément",
+                    "sInfoFiltered":   "(filtré à partir de _MAX_ éléments au total)",
+                    "sInfoPostFix":    "",
+                    "sInfoThousands":  ",",
+                    "sLengthMenu":     "Afficher _MENU_ éléments",
+                    "sLoadingRecords": "Chargement...",
+                    "sProcessing":     "Traitement...",
+                    "sSearch":         "Rechercher :",
+                    "sZeroRecords":    "Aucun élément correspondant trouvé",
+                    "oPaginate": {
+                        "sFirst":    "Premier",
+                        "sLast":     "Dernier",
+                        "sNext":     "Suivant",
+                        "sPrevious": "Précédent"
+                    },
+                    "oAria": {
+                        "sSortAscending":  ": activer pour trier la colonne par ordre croissant",
+                        "sSortDescending": ": activer pour trier la colonne par ordre décroissant"
+                    }
+                },
+            });
+
+            $('#nameFilter, #phoneFilter, #addressFilter').on('keyup', function () {
+                var nameFilter = $('#nameFilter').val();
+                var phoneFilter = $('#phoneFilter').val();
+                var addressFilter = $('#addressFilter').val();
+
+                table.columns(1).search(nameFilter).draw();
+                table.columns(5).search(phoneFilter).draw();
+                table.columns(4).search(addressFilter).draw();
+            });
+
+            $('#genreFilter').on('change', function () {
+                var selectedGenre = $(this).val();
+                selectedGenre = $.fn.dataTable.util.escapeRegex(selectedGenre);
+                table.columns(2).search('\\b' + selectedGenre + '\\b', true, false).draw();
+            });
+
+            $('#dateFilterInput').on('change', function () {
+                var filterDate = $('#dateFilterInput').val();
+
+                if (filterDate !== '') {
+                    var momentFilterDate = moment(filterDate, 'YYYY-MM-DD');
+
+                    if (momentFilterDate.isValid()) {
+                        table.columns(3).search(momentFilterDate.format('YYYY-MM-DD'), false, true).draw();
+                    } else {
+                        table.columns(3).search('').draw();
+                    }
+                } else {
+                    table.columns(3).search('').draw();
+                }
+            });
+
+
+            $('#confirmDeleteBtn').on('click', function () {
+                var form = $(this).data('form');
+                form.submit();
+            });
+
+            $(window).on('beforeunload', function () {
+                $('#deleteConfirmationModal').modal('hide');
+            });
+
+        });
+    </script>
+</body>
+</html>
