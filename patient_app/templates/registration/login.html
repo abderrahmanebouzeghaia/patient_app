@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Connexion</title>
+    <title>FHIR Patients</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    {% load static %}
+    <link rel="icon" href="{% static 'patient_app/logo.png' %}" type="image/png">
     <style>
         body {
             background-color: #f8f9fa;
@@ -21,7 +23,10 @@
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <div class="card p-4">
-                    <h2 class="text-center mb-4">Connexion</h2>
+                    <div class="text-center mb-4">
+                        <img src="{% static 'patient_app/logo.png' %}" alt="Logo du site web" style="width: 50px; height: 50px; display: inline-block;">
+                        <h1 style="display: inline-block; vertical-align: middle; margin-left: 10px;">FHIR Patients</h1>
+                    </div>
                     <form method="post">
                         {% csrf_token %}
                         

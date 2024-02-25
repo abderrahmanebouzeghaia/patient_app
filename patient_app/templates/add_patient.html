@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Ajouter un patient</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'patient_app/logo.png' %}" type="image/png">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
@@ -27,12 +29,12 @@
 
         <div class="form-row">
             <div class="form-group col-md-6">
-                <label for="family_name">Nom de famille:</label>
+                <label for="family_name">Nom de famille:*</label>
                 <input type="text" class="form-control" name="family_name" required>
             </div>
 
             <div class="form-group col-md-6">
-                <label for="given_name">Prénom:</label>
+                <label for="given_name">Prénom:*</label>
                 <input type="text" class="form-control" name="given_name" required>
             </div>
         </div>
@@ -40,7 +42,7 @@
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label for="gender">Sexe:</label>
-                <select class="form-control" name="gender" required>
+                <select class="form-control" name="gender">
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                 </select>
@@ -48,19 +50,19 @@
 
             <div class="form-group col-md-6">
                 <label for="birth_date">Date de naissance:</label>
-                <input type="date" class="form-control" name="birth_date" required>
+                <input type="date" class="form-control" name="birth_date">
             </div>
         </div>
 
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label for="address_line">Adresse:</label>
-                <input type="text" class="form-control" name="address_line" required>
+                <input type="text" class="form-control" name="address_line">
             </div>
 
             <div class="form-group col-md-6">
                 <label for="address_city">Ville:</label>
-                <input type="text" class="form-control" name="address_city" required>
+                <input type="text" class="form-control" name="address_city">
             </div>
         </div>
 
